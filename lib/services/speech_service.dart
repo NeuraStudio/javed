@@ -1,35 +1,35 @@
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:talk_it/talk_it.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SpeechService {
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  final TalkIt _talk = TalkIt();
   bool _ready = false;
 
   Future<bool> init() async {
-    _ready = await _speech.initialize(
-      onError: (e) => print('Speech error: $e'),
-      onStatus: (s) => print('Speech status: $s'),
-    );
+    if (!await Permission.microphone.request().isGranted) return false;
+    _ready = await _talk.initialize();
     return _ready;
   }
-
-  bool get isListening => _speech.isListening;
 
   Future<void> listen({
     required void Function(String text, bool isFinal) onResult,
   }) async {
-    if (!_ready) await init();
-    await _speech.listen(
+    if (!_ready) {
+      final ok = await init();
+      if (!ok) return;
+    }
+    await _talk.listen(
       onResult: (result) {
-        onResult(result.recognizedWords, result.finalResult);
+        onResult(result.recognizedWords, result.isFinal);
       },
     );
   }
 
   Future<void> stop() async {
-    await _speech.stop();
+    await _talk.stop();
   }
 
   Future<void> cancel() async {
-    await _speech.cancel();
+    await _talk.cancel();
   }
 }
