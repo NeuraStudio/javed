@@ -1,0 +1,35 @@
+name: Build javed APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      # Adds the missing gradle/xcode scaffold WITHOUT overwriting
+      # our existing pubspec.yaml, lib/main.dart, AndroidManifest.xml
+      # or app icons (flutter create skips files that already exist).
+      - name: Generate missing Flutter scaffold
+        run: flutter create . --platforms=android --org com.neurastudio --project-name neuraaster
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: javed-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
