@@ -26,3 +26,11 @@ subprojects {
         }
     }
 }
+
+subprojects { project ->
+    project.plugins.withId("com.android.library") {
+        project.android {
+            compileSdkVersion 36
+        }
+    }
+}
