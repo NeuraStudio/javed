@@ -1,0 +1,11 @@
+
+subprojects {
+    project.evaluationDependsOn(':app')
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                compileSdkVersion 36
+            }
+        }
+    }
+}
