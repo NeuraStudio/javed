@@ -1,36 +1,30 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// सबसे महत्वपूर्ण: evaluationDependsOn से पहले compileSdk सेट करना
 subprojects {
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
             project.android {
-                compileSdkVersion 36
+                compileSdkVersion = 36
             }
         }
     }
+}
+
+subprojects {
     project.evaluationDependsOn(':app')
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            project.android {
-                compileSdkVersion 36
-            }
-        }
-    }
 }
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            project.android {
-                compileSdkVersion 36
-            }
-        }
-    }
-}
-
-subprojects { project ->
-    project.plugins.withId("com.android.library") {
-        project.android {
-            compileSdkVersion 36
-        }
-    }
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
 }
